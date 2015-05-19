@@ -1,0 +1,38 @@
+{
+  "name": "gulp.gia.ninja",
+  "version": "0.0.1",
+  "authors": [
+    "Gia <iam@gia.ninja>"
+  ],
+  "description": "from gia.ninja with love",
+  "main": "gulp",
+  "moduleType": [
+    "es6",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "css",
+    "stylus",
+    "jade",
+    "coffeescript",
+    "reactjs"
+  ],
+  "license": "MIT",
+  "homepage": "gulp.gia.ninja",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "normalize": "~1.0.4",
+    "fastclick": "~1.0.6",
+    "fontawesome": "~4.3.0",
+    "react": "~0.13.2",
+    "underscore": "~1.8.3",
+    "jquery": "~2.1.4"
+  }
+}
