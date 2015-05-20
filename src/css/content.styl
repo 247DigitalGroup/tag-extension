@@ -1,0 +1,29 @@
+
+.cl-in-aim
+	border 2px solid #e040fb
+	box-sizing border-box
+
+.clicklion-checked
+	border 5px dotted #7ed321
+	box-sizing border-box
+	
+.clicklion-toolbar
+	z-index 100000000
+	position block
+	position fixed
+	cursor pointer
+	top 20px
+	right 20px
+	> span.clicklion-button
+		font-family sans-serif
+		padding 3px 10px
+		background-color #4a90e2
+		color white
+		font-size 12px
+		border none
+		&.clicklion-active
+			background-color #f31a40
+		&.clicklion-skip
+			background-color #f5a623
+		&.clicklion-disable
+			display none
