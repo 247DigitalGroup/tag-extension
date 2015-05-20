@@ -6,8 +6,12 @@ unpacked extension folder /www
 
 ## node_modules
 
-``` npm install
+```
+npm install
+```
 
 ## bower_components
 
-``` bower install 
+```
+bower install
+``` 
