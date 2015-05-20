@@ -4,4 +4,10 @@ learn how to load an extension for Chrome browser from file system here http://s
 
 unpacked extension folder /www  
 
+## node_modules
 
+``` npm install
+
+## bower_components
+
+``` bower install 
