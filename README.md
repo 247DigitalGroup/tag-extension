@@ -1,7 +1,0 @@
-# tag-extension
-
-learn how to load an extension for Chrome browser from file system here http://superuser.com/questions/247651/how-does-one-install-an-extension-for-chrome-browser-from-the-local-file-system
-
-unpacked extension folder /www  
-
-
