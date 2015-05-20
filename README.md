@@ -15,3 +15,16 @@ npm install
 ```
 bower install
 ``` 
+
+## build
+
+```
+rm -r www
+gulp compile
+```
+
+## start server
+
+```
+gulp server -p PORT
+```
