@@ -1,6 +1,6 @@
 
 
-.clicklion-image:hover {
+.clicklion-image {
   -webkit-animation: clicklion-animation 1000ms linear both;
   animation: clicklion-animation 1000ms linear both;
 }

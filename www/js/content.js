@@ -37,8 +37,11 @@
   };
 
   scrollTo = function(e) {
-    $('.clicklion-checked').removeClass('clicklion-checked');
-    $(e).addClass('clicklion-checked');
+    $('.clicklion-checked, .clicklion-image').removeClass('clicklion-checked').removeClass('clicklion-image');
+    $(e).addClass('clicklion-checked clicklion-image');
+    setTimeout(function() {
+      return $(e).removeClass('clicklion-checked').removeClass('clicklion-image');
+    }, 3000);
     return $('html, body').stop().animate({
       scrollTop: $(e).offset().top
     }, 200);

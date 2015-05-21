@@ -1,5 +1,5 @@
 (function() {
-  var api, createImagesList, getImages, imageClick, imageHover, openUrl, showError, tag, tagging;
+  var api, calcSizes, createImagesList, getImages, imageClick, imageHover, openUrl, showError, tag, tagging;
 
   api = {
     root: 'http://192.168.1.17:8080',
@@ -126,7 +126,8 @@
         image = group[j];
         listHTML += "<li data-src=\"" + image.src + "\" data-path=\"" + image.path + "\"><div class=\"image\" style=\"background-image: url(" + image.path + ")\"></div></li>";
       }
-      results.push($("div#images > ul#" + type).html(listHTML));
+      $("div#images > ul#" + type).html(listHTML);
+      results.push(calcSizes());
     }
     return results;
   };
@@ -142,6 +143,19 @@
         action: 'images'
       }, function(images) {
         return createImagesList(images);
+      });
+    });
+  };
+
+  calcSizes = function() {
+    return $('ul.images > li[data-path]').each(function(i, e) {
+      var src;
+      src = $(e).attr('data-path');
+      return $('<img/>').attr('src', src).load(function() {
+        var h, w;
+        w = this.width;
+        h = this.height;
+        return $(e).find('> div.image').append("<p class=\"meta\">" + w + "x" + h + "</p>");
       });
     });
   };

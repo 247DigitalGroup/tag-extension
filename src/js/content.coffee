@@ -23,10 +23,18 @@ getAllImages = () ->
 
 
 scrollTo = (e) ->
-	$ '.clicklion-checked'
+	$ '.clicklion-checked, .clicklion-image'
 		.removeClass 'clicklion-checked'
+		.removeClass 'clicklion-image'
 	$ e
-		.addClass 'clicklion-checked'
+		.addClass 'clicklion-checked clicklion-image'
+	
+	setTimeout () ->
+			$ e
+				.removeClass 'clicklion-checked'
+				.removeClass 'clicklion-image'
+		, 3000
+
 	$ 'html, body'
 		.stop()
 		.animate {scrollTop: $(e).offset().top}, 200
