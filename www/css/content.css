@@ -1,3 +1,8 @@
+#pressplusOverlay,
+#ppUI,
+.pp_overlay_default {
+  display: none !important;
+}
 .cl-in-aim {
   border: 2px solid #e040fb;
   -webkit-box-sizing: border-box;

@@ -1,105 +1,72 @@
 (function() {
-  var api, current, openUrl, tag;
+  var _tabs;
 
-  api = {
-    root: 'http://192.168.1.17:8080',
-    tag: '/articles/image_tagging',
-    login: '/login'
-  };
-
-  current = {
-    _id: null,
-    url: null
-  };
-
-  tag = function(data) {
-    if (data == null) {
-      data = null;
-    }
-    if (data !== null) {
-      data._id = current._id;
-      data.url = current.url;
-    }
-    console.log('background::tag', data);
-    return $.ajax({
-      url: api.root + api.tag,
-      method: 'post',
-      dataType: 'json',
-      data: data,
-      success: function(res, status, xhr) {
-        typeof res !== 'undefined' && typeof res.data !== 'undefined' && openUrl(res.data);
-        return null;
-      },
-      error: function(xhr, status, e) {
-        var em;
-        em = {
-          action: 'error',
-          code: '0',
-          description: ''
-        };
-        switch (xhr.status) {
-          case 0:
-            em.code = 404;
-            em.description = 'Could not connect to the Tree of Souls!';
-            break;
-          case 401:
-            em.code = 401;
-            em.description = 'You are not one of us!';
-        }
-        chrome.runtime.sendMessage(em);
-        return null;
-      }
-    });
-  };
-
-  openUrl = function(data) {
-    var message;
-    if (typeof data._id !== 'undefined' && typeof data.url !== 'undefined') {
-      current._id = data._id;
-      current.url = data.url;
-      message = {
-        action: 'open',
-        _id: data._id,
-        url: data.url
-      };
-      chrome.tabs.query({
-        active: true,
-        currentWindow: true
-      }, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, message);
-        return null;
-      });
-      return null;
-    }
-  };
+  _tabs = {};
 
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log('background::received', request);
-    if (sender.tab) {
-      if (typeof request.action !== 'undefined') {
+    var message;
+    console.log('get', request);
+    if (request.action) {
+      if (sender.tab) {
         switch (request.action) {
-          case 'tag':
-            return typeof request.data !== 'undefined' && tag(request.data);
+          case 'tab.info':
+            if (typeof _tabs[sender.tab.id] !== 'undefined') {
+              console.log('post', _tabs[sender.tab.id]);
+              sendResponse(_tabs[sender.tab.id]);
+            } else {
+              console.log('post', {});
+              sendResponse({});
+            }
         }
-      }
-    } else {
-      if (typeof request.action !== 'undefined') {
+      } else {
         switch (request.action) {
-          case 'start':
-            return tag();
-          case 'skip':
-            if (current._id !== null) {
-              return tag({
-                _id: current._id,
-                skip: true
+          case 'open':
+            if (typeof request._id !== 'undefined' && typeof request.url !== 'undefined') {
+              message = {
+                action: 'open',
+                _id: request._id,
+                url: request.url
+              };
+              chrome.tabs.query({
+                active: true,
+                currentWindow: true
+              }, function(tabs) {
+                var tabId;
+                tabId = tabs[0].id;
+                _tabs[tabId] = {
+                  _id: request._id,
+                  url: request.url
+                };
+                chrome.tabs.executeScript(tabId, {
+                  code: 'window.onbeforeunload = null;'
+                });
+                return chrome.tabs.update(tabId, {
+                  url: request.url
+                });
               });
             }
             break;
-          case 'api':
-            return sendResponse(api);
+          case 'tab.info':
+            chrome.tabs.query({
+              active: true,
+              currentWindow: true
+            }, function(tabs) {
+              var tabId;
+              tabId = tabs[0].id;
+              if (typeof _tabs[tabId] !== 'undefined') {
+                console.log('post', _tabs[tabId]);
+                return sendResponse(_tabs[tabId]);
+              } else {
+                console.log('post', {});
+                return sendResponse({});
+              }
+            });
         }
       }
     }
+    return true;
   });
+
+  window._tabs = _tabs;
 
 }).call(this);

@@ -1,70 +1,41 @@
-api = 
-  root: 'http://192.168.1.17:8080'
-  tag: '/articles/image_tagging'
-  login: '/login'
-
-current =
-  _id: null
-  url: null
-
-tag = (data = null) ->
-
-  if data isnt null
-    data._id = current._id
-    data.url = current.url
-
-  console.log 'background::tag', data
-
-  $.ajax
-    url: api.root + api.tag
-    method: 'post'
-    dataType: 'json'
-    data: data
-
-    success: (res, status, xhr) ->
-      typeof res isnt 'undefined' and typeof res.data isnt 'undefined' and openUrl res.data
-      null
-
-    error: (xhr, status, e) ->
-      em = action: 'error', code: '0', description: ''
-      switch xhr.status
-        when 0
-          em.code = 404
-          em.description = 'Could not connect to the Tree of Souls!'
-        when 401
-          em.code = 401
-          em.description = 'You are not one of us!'
-      chrome.runtime.sendMessage em
-      null
-
-
-openUrl = (data) ->
-  if typeof data._id isnt 'undefined' and typeof data.url isnt 'undefined'
-    current._id = data._id
-    current.url = data.url
-    message = action: 'open', _id: data._id, url: data.url
-    chrome.tabs.query {active: true, currentWindow: true}, (tabs) ->
-      chrome.tabs.sendMessage tabs[0].id, message
-      null
-    null
+_tabs = {}
 
 chrome
   .runtime
   .onMessage
   .addListener (request, sender, sendResponse) ->
-    console.log 'background::received', request
-    if sender.tab
-      if typeof request.action isnt 'undefined'
+    console.log 'get', request
+    if request.action
+      if sender.tab
         switch request.action
-          when 'tag'
-            typeof request.data isnt 'undefined' and tag request.data
-    else
-      if typeof request.action isnt 'undefined'
+          when 'tab.info'
+            if typeof _tabs[sender.tab.id] isnt 'undefined'
+              console.log 'post', _tabs[sender.tab.id]
+              sendResponse _tabs[sender.tab.id]
+            else
+              console.log 'post', {}
+              sendResponse {}
+      else
         switch request.action
-          when 'start'
-            tag()
-          when 'skip'
-            if current._id isnt null
-              tag _id: current._id, skip: true
-          when 'api'
-            sendResponse api
+          when 'open'
+            if typeof request._id isnt 'undefined' and typeof request.url isnt 'undefined'
+              message = action: 'open', _id: request._id, url: request.url
+              chrome.tabs.query {active: true, currentWindow: true}, (tabs) ->
+                tabId = tabs[0].id
+                _tabs[tabId] =
+                  _id: request._id
+                  url: request.url
+                chrome.tabs.executeScript tabId, code: 'window.onbeforeunload = null;'
+                chrome.tabs.update tabId, url: request.url
+          when 'tab.info'
+            chrome.tabs.query {active: true, currentWindow: true}, (tabs) ->
+              tabId = tabs[0].id
+              if typeof _tabs[tabId] isnt 'undefined'
+                console.log 'post', _tabs[tabId]
+                sendResponse _tabs[tabId]
+              else
+                console.log 'post', {}
+                sendResponse {}
+    return true
+
+window._tabs = _tabs

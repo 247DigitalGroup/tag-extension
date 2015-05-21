@@ -1,78 +1,56 @@
-aim = (e) ->
-	$ '*'
-		.removeClass 'cl-in-aim'
-	$ e.target
-		.addClass 'cl-in-aim'
-	null
+current = {}
 
-clean = (e) ->
-	if $(e.target).attr('class').indexOf('clicklion-') >= 0
-		return null
-	$ e.target
-		.remove()
-	e.stopPropagation()
-	e.preventDefault()
-	null
-
-enterCleanMode = () ->
-	cleanButton.addClass 'clicklion-active'
-	$ '*'
-		.removeClass 'cl-in-aim'
-		.on 'mouseover', aim
-		.on 'click', clean
-	null
-
-exitCleanMode = () ->
-	cleanButton.removeClass 'clicklion-active'
-	$ '*'
-		.removeClass 'cl-in-aim'
-		.off 'mouseover', aim
-		.off 'click', clean
-	null
-
-onCleanMode = no
-
-checked = {}
-tagButton = $ '<span class="clicklion-button">Submit</span>'
-	.click () ->
-		data =
-			html: document.documentElement.outerHTML
-			image_urls: Object.keys checked
-			note: ''
-		chrome.runtime.sendMessage {action: 'tag', data: data}
-
-cleanButton = $ '<span class="clicklion-button">Clean</span>'
-	.click () ->
-		if onCleanMode
-			exitCleanMode()
-			onCleanMode = false
-		else
-			enterCleanMode()
-			onCleanMode = true
-
-toolbar = $ '<div class="clicklion-toolbar"></div>'
-$ toolbar
-	.append tagButton
-	.append cleanButton
-
-check = (e) ->
-	if e.altKey is false
-		e.preventDefault()
-		src = $(@).attr('src')
-		if typeof checked[src] is 'undefined'
-			checked[src] = true
-			$(@).addClass 'clicklion-checked'
-		else
-			delete checked[src]
-			$(@).removeClass 'clicklion-checked'
+sendImages = (images) ->
+	chrome.runtime.sendMessage action: 'images', data: images
 
 
-# if window.location.hash.search('#clicklion') >= 0
-if true
-	$ document
-		.delegate 'img', 'contextmenu', check
-	$ 'body'
-		.append toolbar
+getAllImages = () ->
+	images = $ 'img'
+		.map (i, e) ->
+			return {
+				depth: $(e).parents().length
+				width: $(e).width()
+				height: $(e).height()
+				src: $(e).attr('src')
+				path: $(e)[0].src
+			}
+	images = _.groupBy images, (o) ->
+		if o.width * o.height > 120000 then return 'xlarge'
+		if o.width * o.height > 50000 then return 'large'
+		if o.width * o.height > 12000 then return 'medium'
+		return 'small'
+	images
+
+
+scrollTo = (e) ->
+	$ '.clicklion-checked'
+		.removeClass 'clicklion-checked'
+	$ e
+		.addClass 'clicklion-checked'
+	$ 'html, body'
+		.stop()
+		.animate {scrollTop: $(e).offset().top}, 200
+
+
+findImage = (src) -> 
+	scrollTo $("img[src='#{src}']")
+
+
+syncTab = () ->
+	chrome
+		.runtime
+		.sendMessage {action: 'tab.info'}, (info) ->
+			console.log info
+			if typeof info._id isnt 'undefined' and typeof info.url isnt 'undefined'
+				current = info
+				window.onbeforeunload = () -> 'Anti-redirect...'
+				$ document
+					.ready () ->
+						chrome.runtime.sendMessage action: 'images', data: getAllImages()
+
+
+syncTab()
+
 
 chrome
 	.runtime
@@ -81,6 +59,16 @@ chrome
 		console.log 'content::received', request
 		if typeof request.action isnt 'undefined'
 			switch request.action
-				when 'open'
-					if typeof request.url isnt 'undefined'
-						window.location = "#{request.url}"
+				when 'images'
+					if document.readyState is 'complete'
+						sendResponse getAllImages()
+					else
+						$ document
+							.unbind 'ready'
+							.bind 'ready', () ->
+								sendResponse getAllImages()
+				when 'show'
+					if typeof request.src isnt 'undefined'
+						findImage request.src
+				when 'html'
+					sendResponse document.documentElement.outerHTML

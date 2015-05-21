@@ -1,93 +1,95 @@
 (function() {
-  var aim, check, checked, clean, cleanButton, enterCleanMode, exitCleanMode, onCleanMode, tagButton, toolbar;
+  var current, findImage, getAllImages, scrollTo, sendImages, syncTab;
 
-  aim = function(e) {
-    $('*').removeClass('cl-in-aim');
-    $(e.target).addClass('cl-in-aim');
-    return null;
-  };
+  current = {};
 
-  clean = function(e) {
-    if ($(e.target).attr('class').indexOf('clicklion-') >= 0) {
-      return null;
-    }
-    $(e.target).remove();
-    e.stopPropagation();
-    e.preventDefault();
-    return null;
-  };
-
-  enterCleanMode = function() {
-    cleanButton.addClass('clicklion-active');
-    $('*').removeClass('cl-in-aim').on('mouseover', aim).on('click', clean);
-    return null;
-  };
-
-  exitCleanMode = function() {
-    cleanButton.removeClass('clicklion-active');
-    $('*').removeClass('cl-in-aim').off('mouseover', aim).off('click', clean);
-    return null;
-  };
-
-  onCleanMode = false;
-
-  checked = {};
-
-  tagButton = $('<span class="clicklion-button">Submit</span>').click(function() {
-    var data;
-    data = {
-      html: document.documentElement.outerHTML,
-      image_urls: Object.keys(checked),
-      note: ''
-    };
+  sendImages = function(images) {
     return chrome.runtime.sendMessage({
-      action: 'tag',
-      data: data
+      action: 'images',
+      data: images
     });
-  });
-
-  cleanButton = $('<span class="clicklion-button">Clean</span>').click(function() {
-    if (onCleanMode) {
-      exitCleanMode();
-      return onCleanMode = false;
-    } else {
-      enterCleanMode();
-      return onCleanMode = true;
-    }
-  });
-
-  toolbar = $('<div class="clicklion-toolbar"></div>');
-
-  $(toolbar).append(tagButton).append(cleanButton);
-
-  check = function(e) {
-    var src;
-    if (e.altKey === false) {
-      e.preventDefault();
-      src = $(this).attr('src');
-      if (typeof checked[src] === 'undefined') {
-        checked[src] = true;
-        return $(this).addClass('clicklion-checked');
-      } else {
-        delete checked[src];
-        return $(this).removeClass('clicklion-checked');
-      }
-    }
   };
 
-  if (true) {
-    $(document).delegate('img', 'contextmenu', check);
-    $('body').append(toolbar);
-  }
+  getAllImages = function() {
+    var images;
+    images = $('img').map(function(i, e) {
+      return {
+        depth: $(e).parents().length,
+        width: $(e).width(),
+        height: $(e).height(),
+        src: $(e).attr('src'),
+        path: $(e)[0].src
+      };
+    });
+    images = _.groupBy(images, function(o) {
+      if (o.width * o.height > 120000) {
+        return 'xlarge';
+      }
+      if (o.width * o.height > 50000) {
+        return 'large';
+      }
+      if (o.width * o.height > 12000) {
+        return 'medium';
+      }
+      return 'small';
+    });
+    return images;
+  };
+
+  scrollTo = function(e) {
+    $('.clicklion-checked').removeClass('clicklion-checked');
+    $(e).addClass('clicklion-checked');
+    return $('html, body').stop().animate({
+      scrollTop: $(e).offset().top
+    }, 200);
+  };
+
+  findImage = function(src) {
+    return scrollTo($("img[src='" + src + "']"));
+  };
+
+  syncTab = function() {
+    return chrome.runtime.sendMessage({
+      action: 'tab.info'
+    }, function(info) {
+      console.log(info);
+      if (typeof info._id !== 'undefined' && typeof info.url !== 'undefined') {
+        current = info;
+        window.onbeforeunload = function() {
+          return 'Anti-redirect...';
+        };
+        return $(document).ready(function() {
+          return chrome.runtime.sendMessage({
+            action: 'images',
+            data: getAllImages()
+          });
+        });
+      }
+    });
+  };
+
+  syncTab();
 
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log('content::received', request);
     if (typeof request.action !== 'undefined') {
       switch (request.action) {
-        case 'open':
-          if (typeof request.url !== 'undefined') {
-            return window.location = "" + request.url;
+        case 'images':
+          if (document.readyState === 'complete') {
+            return sendResponse(getAllImages());
+          } else {
+            return $(document).unbind('ready').bind('ready', function() {
+              return sendResponse(getAllImages());
+            });
           }
+          break;
+        case 'show':
+          if (typeof request.src !== 'undefined') {
+            return findImage(request.src);
+          }
+          break;
+        case 'html':
+          return sendResponse(document.documentElement.outerHTML);
       }
     }
   });

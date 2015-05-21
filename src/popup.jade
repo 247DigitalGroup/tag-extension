@@ -9,21 +9,33 @@ html
 		title Tagger
 		link(rel="shortcut icon", href="/img/icon.png", type="image/png")
 		link(rel="stylesheet", href="/bower/fontawesome/css/font-awesome.min.css")
+		link(rel="stylesheet", href="/css/gia.ui.css")
 		link(rel="stylesheet", href="/css/popup.css")
 
 	body
 
-		#error.hide
-			h1.code 0
-			p.description Description
 
 		.buttons
-			button#start Start
+			button#tag Tag
 			button#skip Skip
-			button#login-toggle Login?
 
-		.progress.hide
-			.progress-bar
+
+		#images
+			#error.hide
+				h1.code 0
+				p.description Description
+			.progress.hide
+				.progress-bar
+			h5 xlarge
+			ul#xlarge.images.bg.sm-2.sp-0
+			h5 large
+			ul#large.images.bg.sm-3.sp-0
+			h5 medium
+			ul#medium.images.bg.sm-3.sp-0
+			h5 small
+			ul#small.images.bg.sm-4.sp-0
+
+				
 
 		form#login-form
 			input#email(type="text", value="gia@coa.vn", placeholder="your@email.com")
@@ -31,5 +43,8 @@ html
 			p.status.hide
 			button#login Submit
 
+
+
 		script(type="text/javascript", src="/bower/jquery/dist/jquery.min.js")
+		script(type="text/javascript", src="/bower/underscore/underscore-min.js")
 		script(type="text/javascript", src="/js/popup.js")
