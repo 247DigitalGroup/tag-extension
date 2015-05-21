@@ -35,9 +35,10 @@ scrollTo = (e) ->
 				.removeClass 'clicklion-image'
 		, 3000
 
+	y = $(e).offset().top - ($(window).height() - $(e).height()) / 2
 	$ 'html, body'
 		.stop()
-		.animate {scrollTop: $(e).offset().top}, 200
+		.animate {scrollTop: y}, 200
 
 
 findImage = (src) -> 

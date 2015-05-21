@@ -37,13 +37,15 @@
   };
 
   scrollTo = function(e) {
+    var y;
     $('.clicklion-checked, .clicklion-image').removeClass('clicklion-checked').removeClass('clicklion-image');
     $(e).addClass('clicklion-checked clicklion-image');
     setTimeout(function() {
       return $(e).removeClass('clicklion-checked').removeClass('clicklion-image');
     }, 3000);
+    y = $(e).offset().top - ($(window).height() - $(e).height()) / 2;
     return $('html, body').stop().animate({
-      scrollTop: $(e).offset().top
+      scrollTop: y
     }, 200);
   };
 
