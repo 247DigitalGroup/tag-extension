@@ -124,7 +124,7 @@
       listHTML = '';
       for (j = 0, len = group.length; j < len; j++) {
         image = group[j];
-        listHTML += "<li data-src=\"" + image.src + "\" data-path=\"" + image.path + "\"><div class=\"image\" style=\"background-image: url(" + image.path + ")\"></div></li>";
+        listHTML += "<li data-src=\"" + image.src + "\" data-path=\"" + image.path + "\"><div class=\"image\" style=\"background-image: url(" + (encodeURI(image.path)) + ")\"></div></li>";
       }
       $("div#images > ul#" + type).html(listHTML);
       results.push(calcSizes());

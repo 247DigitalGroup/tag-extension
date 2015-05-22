@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Tagger</title>
+    <link rel="shortcut icon" href="/img/icon.png" type="image/png">
+    <link rel="stylesheet" href="/bower/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/gia.ui.css">
+    <link rel="stylesheet" href="/css/popup.css">
+  </head>
+  <body ng-app="ClickLionTagger">
+    <div ng-controller="PopupController" ng-init="init()">
+      <div class="buttons">
+        <button ng-click="check()">Tag</button>
+        <button ng-click="skip()">Skip</button>
+        <button ng-click="refresh()">Refresh</button>
+      </div>
+      <div id="images">
+        <div id="error">
+          <h1 ng-bind="error.code" class="code"></h1>
+          <p ng-bind="error.description" class="description"></p>
+        </div>
+        <h5>xlarge</h5>
+        <ul id="xlarge" class="images bg sm-2 sp-0">
+          <li ng-repeat="img in imgs" ng-if="img.area &gt;= 120000">
+            <div ng-style="{ 'background-image': 'url(' + img.path + ')' }" ng-class="{ selected: img.selected }" ng-right-click="select(img)" ng-click="find(img)" class="image">
+              <p ng-bind="img.width + 'x' + img.height" class="meta"></p>
+            </div>
+          </li>
+        </ul>
+        <h5>large</h5>
+        <ul id="large" class="images bg sm-3 sp-0">
+          <li ng-repeat="img in imgs" ng-if="img.area &gt;= 50000 &amp;&amp; img.area &lt; 120000">
+            <div ng-style="{ 'background-image': 'url(' + img.path + ')' }" ng-class="{ selected: img.selected }" ng-right-click="select(img)" ng-click="find(img)" class="image">
+              <p ng-bind="img.width + 'x' + img.height" class="meta"></p>
+            </div>
+          </li>
+        </ul>
+        <h5>medium</h5>
+        <ul id="medium" class="images bg sm-3 sp-0">
+          <li ng-repeat="img in imgs" ng-if="img.area &gt;= 12000 &amp;&amp; img.area &lt; 50000">
+            <div ng-style="{ 'background-image': 'url(' + img.path + ')' }" ng-class="{ selected: img.selected }" ng-right-click="select(img)" ng-click="find(img)" class="image">
+              <p ng-bind="img.width + 'x' + img.height" class="meta"></p>
+            </div>
+          </li>
+        </ul>
+        <h5>small</h5>
+        <ul id="small" class="images bg sm-4 sp-0">
+          <li ng-repeat="img in imgs" ng-if="img.area &lt; 12000">
+            <div ng-style="{ 'background-image': 'url(' + img.path + ')' }" ng-class="{ selected: img.selected }" ng-right-click="select(img)" ng-click="find(img)" class="image">
+              <p ng-bind="img.width + 'x' + img.height" class="meta"></p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <form id="login-form" ng-submit="login()">
+        <input id="email" type="text" placeholder="your@email.com" ng-model="user.email">
+        <input id="password" type="password" placeholder="password" ng-model="user.password">
+        <p class="status hide"></p>
+        <button id="login">Submit</button>
+      </form>
+    </div>
+    <script type="text/javascript" src="/bower/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/bower/angular/angular.min.js"></script>
+    <script type="text/javascript" src="/bower/underscore/underscore-min.js"></script>
+    <script type="text/javascript" src="/js/apopup.js"></script>
+  </body>
+</html>

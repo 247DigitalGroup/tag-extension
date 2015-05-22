@@ -77,16 +77,18 @@ imageClick = (e) ->
   e.preventDefault()
 
 
+
 createImagesList = (images) ->
   $ 'div#images > ul.images'
     .html ''
   for type, group of images
     listHTML = ''
     for image in group
-      listHTML += "<li data-src=\"#{image.src}\" data-path=\"#{image.path}\"><div class=\"image\" style=\"background-image: url(#{image.path})\"></div></li>"
+      listHTML += "<li data-src=\"#{image.src}\" data-path=\"#{image.path}\"><div class=\"image\" style=\"background-image: url(#{encodeURI(image.path)})\"></div></li>"
     $ "div#images > ul##{type}"
       .html listHTML
     calcSizes()
+
 
 
 getImages = () ->
@@ -96,6 +98,7 @@ getImages = () ->
       currentTabId = tabs[0].id
       chrome.tabs.sendMessage currentTabId, {action: 'images'}, (images) ->
         createImagesList images
+
 
 
 calcSizes = () ->
@@ -110,6 +113,7 @@ calcSizes = () ->
           $ e
             .find '> div.image'
             .append "<p class=\"meta\">#{w}x#{h}</p>"
+
 
 
 $ document

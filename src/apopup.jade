@@ -1,0 +1,85 @@
+doctype
+html
+
+	head
+		meta(charset='utf-8')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0')
+		meta(name='apple-mobile-web-app-capable', content='yes')
+		meta(name='apple-mobile-web-app-status-bar-style', content='black')
+		title Tagger
+		link(rel="shortcut icon", href="/img/icon.png", type="image/png")
+		link(rel="stylesheet", href="/bower/fontawesome/css/font-awesome.min.css")
+		link(rel="stylesheet", href="/css/gia.ui.css")
+		link(rel="stylesheet", href="/css/popup.css")
+
+	body(ng-app="ClickLionTagger")
+
+
+		//- .buttons
+			button#tag Tag
+			button#skip Skip
+
+		div(ng-controller="PopupController", ng-init="init()")
+
+			.buttons
+				button(ng-click="check()") Tag
+				button(ng-click="skip()") Skip
+				button(ng-click="refresh()") Refresh
+			
+			#images
+				#error
+					h1.code(ng-bind="error.code")
+					p.description(ng-bind="error.description")
+				h5 xlarge
+				ul.images.bg.sm-2.sp-0#xlarge
+					li(ng-repeat="img in imgs", ng-if="img.area >= 120000")
+						.image(ng-style="{ 'background-image': 'url(' + img.path + ')' }", ng-class="{ selected: img.selected }", ng-right-click="select(img)", ng-click="find(img)")
+							p.meta(ng-bind="img.width + 'x' + img.height")
+				h5 large
+				ul.images.bg.sm-3.sp-0#large
+					li(ng-repeat="img in imgs", ng-if="img.area >= 50000 && img.area < 120000")
+						.image(ng-style="{ 'background-image': 'url(' + img.path + ')' }", ng-class="{ selected: img.selected }", ng-right-click="select(img)", ng-click="find(img)")
+							p.meta(ng-bind="img.width + 'x' + img.height")
+				h5 medium
+				ul.images.bg.sm-3.sp-0#medium
+					li(ng-repeat="img in imgs", ng-if="img.area >= 12000 && img.area < 50000")
+						.image(ng-style="{ 'background-image': 'url(' + img.path + ')' }", ng-class="{ selected: img.selected }", ng-right-click="select(img)", ng-click="find(img)")
+							p.meta(ng-bind="img.width + 'x' + img.height")
+				h5 small
+				ul.images.bg.sm-4.sp-0#small
+					li(ng-repeat="img in imgs", ng-if="img.area < 12000")
+						.image(ng-style="{ 'background-image': 'url(' + img.path + ')' }", ng-class="{ selected: img.selected }", ng-right-click="select(img)", ng-click="find(img)")
+							p.meta(ng-bind="img.width + 'x' + img.height")
+
+
+			form#login-form(ng-submit="login()")
+				input#email(type="text", placeholder="your@email.com", ng-model="user.email")
+				input#password(type="password", placeholder="password", ng-model="user.password")
+				p.status.hide
+				button#login Submit
+
+
+		//- #images
+			#error.hide
+				h1.code 0
+				p.description Description
+			.progress.hide
+				.progress-bar
+			h5 xlarge
+			ul#xlarge.images.bg.sm-2.sp-0
+			h5 large
+			ul#large.images.bg.sm-3.sp-0
+			h5 medium
+			ul#medium.images.bg.sm-3.sp-0
+			h5 small
+			ul#small.images.bg.sm-4.sp-0
+
+				
+
+
+
+		script(type="text/javascript", src="/bower/jquery/dist/jquery.min.js")
+		script(type="text/javascript", src="/bower/angular/angular.min.js")
+		script(type="text/javascript", src="/bower/underscore/underscore-min.js")
+		script(type="text/javascript", src="/js/apopup.js")
+		//- script(type="text/javascript", src="/js/popup.js")

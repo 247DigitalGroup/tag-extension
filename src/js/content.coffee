@@ -42,7 +42,7 @@ scrollTo = (e) ->
 
 
 findImage = (src) -> 
-	scrollTo $("img[src='#{src}']")
+	scrollTo $("img[src=\"#{encodeURI(src)}\"]")
 
 
 syncTab = () ->

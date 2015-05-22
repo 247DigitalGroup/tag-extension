@@ -50,7 +50,7 @@
   };
 
   findImage = function(src) {
-    return scrollTo($("img[src='" + src + "']"));
+    return scrollTo($("img[src=\"" + (encodeURI(src)) + "\"]"));
   };
 
   syncTab = function() {
