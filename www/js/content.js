@@ -1,5 +1,5 @@
 (function() {
-  var current, findImage, getAllImages, scrollTo, sendImages, syncTab;
+  var current, findImage, getAllImages, scrollTo, sendImages, showAll, syncTab;
 
   current = {};
 
@@ -50,7 +50,7 @@
   };
 
   findImage = function(src) {
-    return scrollTo($("img[src=\"" + (encodeURI(src)) + "\"]"));
+    return scrollTo($("img[src=\"" + src + "\"]"));
   };
 
   syncTab = function() {
@@ -71,6 +71,19 @@
         });
       }
     });
+  };
+
+  showAll = function(reveal) {
+    if (reveal == null) {
+      reveal = true;
+    }
+    if (reveal) {
+      return $('img').addClass('clicklion-reveal').each(function(i, e) {
+        return $(e).parents().addClass('clicklion-reveal');
+      });
+    } else {
+      return $('.clicklion-reveal').removeClass('clicklion-reveal');
+    }
   };
 
   syncTab();
@@ -95,6 +108,10 @@
           break;
         case 'html':
           return sendResponse(document.documentElement.outerHTML);
+        case 'reveal':
+          return showAll(true);
+        case 'unreveal':
+          return showAll(false);
       }
     }
   });

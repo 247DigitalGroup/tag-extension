@@ -12,6 +12,8 @@ openUrl = (data) ->
     chrome.runtime.sendMessage message
     $ 'div#images ul.images'
       .html ''
+    $ 'input#reveal'
+      .prop 'checked', false
     null
 
 
@@ -78,13 +80,20 @@ imageClick = (e) ->
 
 
 
+imageOpen = (e) ->
+  path = $ e.currentTarget
+    .attr 'data-path'
+  window.open path
+
+
+
 createImagesList = (images) ->
   $ 'div#images > ul.images'
     .html ''
   for type, group of images
     listHTML = ''
     for image in group
-      listHTML += "<li data-src=\"#{image.src}\" data-path=\"#{image.path}\"><div class=\"image\" style=\"background-image: url(#{encodeURI(image.path)})\"></div></li>"
+      listHTML += "<li data-src=\"#{image.src}\" data-path=\"#{image.path}\"><div class=\"image\" style=\"background-image: url(#{image.path})\"></div></li>"
     $ "div#images > ul##{type}"
       .html listHTML
     calcSizes()
@@ -124,6 +133,7 @@ $ document
     $ 'ul.images'
       .delegate '> li', 'click', imageHover
       .delegate '> li', 'contextmenu', imageClick
+      .delegate '> li', 'dblclick', imageOpen
 
     $ '#tag'
       .click () ->
@@ -146,6 +156,15 @@ $ document
       .click () ->
         tag skip: true
 
+
+    $ '#reveal'
+      .change () ->
+        value = $ this
+          .prop 'checked'
+        if value is true then action = 'reveal' else action = 'unreveal'
+        chrome.tabs.query {active: true, currentWindow: true}, (tabs) ->
+          chrome.tabs.sendMessage tabs[0].id, {action: action}
+          null
 
 
     $ '#login'

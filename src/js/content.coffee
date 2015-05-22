@@ -42,7 +42,7 @@ scrollTo = (e) ->
 
 
 findImage = (src) -> 
-	scrollTo $("img[src=\"#{encodeURI(src)}\"]")
+	scrollTo $("img[src=\"#{src}\"]")
 
 
 syncTab = () ->
@@ -56,6 +56,19 @@ syncTab = () ->
 				$ document
 					.ready () ->
 						chrome.runtime.sendMessage action: 'images', data: getAllImages()
+
+
+showAll = (reveal = true) ->
+	if reveal
+		$ 'img'
+			.addClass 'clicklion-reveal'
+			.each (i, e) ->
+				$ e
+					.parents()
+					.addClass 'clicklion-reveal'
+	else
+		$ '.clicklion-reveal'
+			.removeClass 'clicklion-reveal'
 
 
 syncTab()
@@ -81,3 +94,7 @@ chrome
 						findImage request.src
 				when 'html'
 					sendResponse document.documentElement.outerHTML
+				when 'reveal'
+					showAll true
+				when 'unreveal'
+					showAll false

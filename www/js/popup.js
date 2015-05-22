@@ -1,5 +1,5 @@
 (function() {
-  var api, calcSizes, createImagesList, getImages, imageClick, imageHover, openUrl, showError, tag, tagging;
+  var api, calcSizes, createImagesList, getImages, imageClick, imageHover, imageOpen, openUrl, showError, tag, tagging;
 
   api = {
     root: 'http://192.168.1.17:8080',
@@ -19,6 +19,7 @@
       };
       chrome.runtime.sendMessage(message);
       $('div#images ul.images').html('');
+      $('input#reveal').prop('checked', false);
       return null;
     }
   };
@@ -115,6 +116,12 @@
     return e.preventDefault();
   };
 
+  imageOpen = function(e) {
+    var path;
+    path = $(e.currentTarget).attr('data-path');
+    return window.open(path);
+  };
+
   createImagesList = function(images) {
     var group, image, j, len, listHTML, results, type;
     $('div#images > ul.images').html('');
@@ -124,7 +131,7 @@
       listHTML = '';
       for (j = 0, len = group.length; j < len; j++) {
         image = group[j];
-        listHTML += "<li data-src=\"" + image.src + "\" data-path=\"" + image.path + "\"><div class=\"image\" style=\"background-image: url(" + (encodeURI(image.path)) + ")\"></div></li>";
+        listHTML += "<li data-src=\"" + image.src + "\" data-path=\"" + image.path + "\"><div class=\"image\" style=\"background-image: url(" + image.path + ")\"></div></li>";
       }
       $("div#images > ul#" + type).html(listHTML);
       results.push(calcSizes());
@@ -162,7 +169,7 @@
 
   $(document).ready(function() {
     getImages();
-    $('ul.images').delegate('> li', 'click', imageHover).delegate('> li', 'contextmenu', imageClick);
+    $('ul.images').delegate('> li', 'click', imageHover).delegate('> li', 'contextmenu', imageClick).delegate('> li', 'dblclick', imageOpen);
     $('#tag').click(function() {
       return chrome.tabs.query({
         active: true,
@@ -190,6 +197,24 @@
     $('#skip').click(function() {
       return tag({
         skip: true
+      });
+    });
+    $('#reveal').change(function() {
+      var action, value;
+      value = $(this).prop('checked');
+      if (value === true) {
+        action = 'reveal';
+      } else {
+        action = 'unreveal';
+      }
+      return chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      }, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: action
+        });
+        return null;
       });
     });
     return $('#login').click(function(e) {
