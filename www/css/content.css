@@ -9,6 +9,15 @@
   -ms-filter: none !important;
   filter: none !important;
   visibility: visible !important;
+  position: initial !important;
+  overflow: visible !important;
+  height: auto !important;
+  width: auto !important;
+  max-height: none !important;
+  max-width: none !important;
+  min-height: none !important;
+  max-height: none !important;
+  float: none !important;
 }
 .cl-in-aim {
   border: 2px solid #e040fb;

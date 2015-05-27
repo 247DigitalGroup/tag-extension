@@ -12,13 +12,13 @@
 
   getAllImages = function() {
     var images;
-    images = $('img').map(function(i, e) {
+    images = jQuery('img').map(function(i, e) {
       return {
-        depth: $(e).parents().length,
-        width: $(e).width(),
-        height: $(e).height(),
-        src: $(e).attr('src'),
-        path: $(e)[0].src
+        depth: jQuery(e).parents().length,
+        width: jQuery(e).width(),
+        height: jQuery(e).height(),
+        src: jQuery(e).attr('src'),
+        path: jQuery(e)[0].src
       };
     });
     images = _.groupBy(images, function(o) {
@@ -38,19 +38,19 @@
 
   scrollTo = function(e) {
     var y;
-    $('.clicklion-checked, .clicklion-image').removeClass('clicklion-checked').removeClass('clicklion-image');
-    $(e).addClass('clicklion-checked clicklion-image');
+    jQuery('.clicklion-checked, .clicklion-image').removeClass('clicklion-checked').removeClass('clicklion-image');
+    jQuery(e).addClass('clicklion-checked clicklion-image');
     setTimeout(function() {
-      return $(e).removeClass('clicklion-checked').removeClass('clicklion-image');
+      return jQuery(e).removeClass('clicklion-checked').removeClass('clicklion-image');
     }, 3000);
-    y = $(e).offset().top - ($(window).height() - $(e).height()) / 2;
-    return $('html, body').stop().animate({
+    y = jQuery(e).offset().top - (jQuery(window).height() - jQuery(e).height()) / 2;
+    return jQuery('html, body').stop().animate({
       scrollTop: y
     }, 200);
   };
 
   findImage = function(src) {
-    return scrollTo($("img[src=\"" + src + "\"]"));
+    return scrollTo(jQuery("img[src=\"" + src + "\"]"));
   };
 
   syncTab = function() {
@@ -63,7 +63,7 @@
         window.onbeforeunload = function() {
           return 'Anti-redirect...';
         };
-        return $(document).ready(function() {
+        return jQuery(document).ready(function() {
           return chrome.runtime.sendMessage({
             action: 'images',
             data: getAllImages()
@@ -74,15 +74,24 @@
   };
 
   showAll = function(reveal) {
+    var revealCSS;
     if (reveal == null) {
       reveal = true;
     }
     if (reveal) {
-      return $('img').addClass('clicklion-reveal').each(function(i, e) {
-        return $(e).parents().addClass('clicklion-reveal');
+      revealCSS = {
+        'display': 'block',
+        'overflow': 'visible',
+        'position': 'initial',
+        'visibility': 'visible',
+        'opacity': 1,
+        'float': 'none'
+      };
+      return jQuery('img').addClass('clicklion-reveal').each(function(i, e) {
+        return jQuery(e).addClass('clicklion-reveal').parents().addClass('clicklion-reveal');
       });
     } else {
-      return $('.clicklion-reveal').removeClass('clicklion-reveal');
+      return jQuery('.clicklion-reveal').removeClass('clicklion-reveal');
     }
   };
 
@@ -96,7 +105,7 @@
           if (document.readyState === 'complete') {
             return sendResponse(getAllImages());
           } else {
-            return $(document).unbind('ready').bind('ready', function() {
+            return jQuery(document).unbind('ready').bind('ready', function() {
               return sendResponse(getAllImages());
             });
           }
