@@ -13,6 +13,28 @@ showError = () ->
 	null
 
 
+getImages = () ->
+	$ doc
+		.find 'ul.images'
+		.html ''
+	$ 'img'
+		.each (i, e) ->
+			img = new Image()
+			img.onload = () ->
+				if img.width >= 320 and img.height >= 240
+					_image = 
+						w: img.width
+						h: img.height
+						_src: $(img).attr 'src'
+						src: encodeURI($(img).attr 'src')
+						path: img.src
+					if _image.w * _image.h >= 153000 then return addImageXLarge _image
+					if _image.w * _image.h >= 76800 then return addImageLarge _image
+					if _image.w * _image.h > 12000 then return addImageMedium _image
+					return addImageSmall _image
+			img.src = $(e).attr 'src'
+
+
 tag = (data) ->
 	if typeof tabInfo._id isnt 'undefined' and typeof tabInfo.url isnt 'undefined'
 		data._id = tabInfo._id
@@ -95,7 +117,7 @@ init = () ->
 		<div class="buttons">
 			<button id="tag">Tag</button>
 			<button id="skip">Skip</button>
-			<input type="checkbox" id="reveal"/>
+			<button id="refresh">Refresh</button>
 		</div>
 		<div class="selector">
 			<h5>xlarge</h5>
@@ -172,6 +194,9 @@ init = () ->
 				skip: true
 			tag data
 		.end()
+		.find 'button#refresh'
+		.click () ->
+			getImages()
 	# window unload check
 	window.onbeforeunload = () -> 'Anti-redirect...'
 	# bind document init
@@ -181,19 +206,4 @@ init = () ->
 				.find '#loading'
 				.stop()
 				.fadeOut()
-			$ 'img'
-				.each (i, e) ->
-					img = new Image()
-					img.onload = () ->
-						if img.width >= 320 and img.height >= 240
-							_image = 
-								w: img.width
-								h: img.height
-								_src: $(img).attr 'src'
-								src: encodeURI($(img).attr 'src')
-								path: img.src
-							if _image.w * _image.h >= 153000 then return addImageXLarge _image
-							if _image.w * _image.h >= 76800 then return addImageLarge _image
-							if _image.w * _image.h > 12000 then return addImageMedium _image
-							return addImageSmall _image
-					img.src = $(e).attr 'src'
+			getImages()

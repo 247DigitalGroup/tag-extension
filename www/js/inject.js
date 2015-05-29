@@ -1,5 +1,5 @@
 (function() {
-  var _images, addImage, addImageLarge, addImageMedium, addImageSmall, addImageXLarge, api, doc, findImage, getTabInfo, init, scrollTo, showError, tabInfo, tag;
+  var _images, addImage, addImageLarge, addImageMedium, addImageSmall, addImageXLarge, api, doc, findImage, getImages, getTabInfo, init, scrollTo, showError, tabInfo, tag;
 
   api = {
     root: 'http://192.168.1.17:8080',
@@ -15,6 +15,37 @@
 
   showError = function() {
     return null;
+  };
+
+  getImages = function() {
+    $(doc).find('ul.images').html('');
+    return $('img').each(function(i, e) {
+      var img;
+      img = new Image();
+      img.onload = function() {
+        var _image;
+        if (img.width >= 320 && img.height >= 240) {
+          _image = {
+            w: img.width,
+            h: img.height,
+            _src: $(img).attr('src'),
+            src: encodeURI($(img).attr('src')),
+            path: img.src
+          };
+          if (_image.w * _image.h >= 153000) {
+            return addImageXLarge(_image);
+          }
+          if (_image.w * _image.h >= 76800) {
+            return addImageLarge(_image);
+          }
+          if (_image.w * _image.h > 12000) {
+            return addImageMedium(_image);
+          }
+          return addImageSmall(_image);
+        }
+      };
+      return img.src = $(e).attr('src');
+    });
   };
 
   tag = function(data) {
@@ -116,7 +147,7 @@
   init = function() {
     var html, iframe;
     iframe = $('<iframe id="clicklion-iframe"/>');
-    html = '<div id="loading"></div>\n<div class="buttons">\n	<button id="tag">Tag</button>\n	<button id="skip">Skip</button>\n	<input type="checkbox" id="reveal"/>\n</div>\n<div class="selector">\n	<h5>xlarge</h5>\n	<ul class="images bg sp-0 sm-2" id="xlarge"></ul>\n	<h5>large</h5>\n	<ul class="images bg sp-0 sm-3" id="large"></ul>\n	<h5 class="h">medium</h5>\n	<ul class="images bg sp-0 sm-3 h" id="medium"></ul>\n	<h5 class="h">small</h5>\n	<ul class="images bg sp-0 sm-4 h" id="small"></ul>\n</div>';
+    html = '<div id="loading"></div>\n<div class="buttons">\n	<button id="tag">Tag</button>\n	<button id="skip">Skip</button>\n	<button id="refresh">Refresh</button>\n</div>\n<div class="selector">\n	<h5>xlarge</h5>\n	<ul class="images bg sp-0 sm-2" id="xlarge"></ul>\n	<h5>large</h5>\n	<ul class="images bg sp-0 sm-3" id="large"></ul>\n	<h5 class="h">medium</h5>\n	<ul class="images bg sp-0 sm-3 h" id="medium"></ul>\n	<h5 class="h">small</h5>\n	<ul class="images bg sp-0 sm-4 h" id="small"></ul>\n</div>';
     $(iframe).css({
       position: 'fixed',
       right: '20px',
@@ -166,39 +197,15 @@
         skip: true
       };
       return tag(data);
-    }).end();
+    }).end().find('button#refresh').click(function() {
+      return getImages();
+    });
     window.onbeforeunload = function() {
       return 'Anti-redirect...';
     };
     return $(document).ready(function() {
       $(doc).find('#loading').stop().fadeOut();
-      return $('img').each(function(i, e) {
-        var img;
-        img = new Image();
-        img.onload = function() {
-          var _image;
-          if (img.width >= 320 && img.height >= 240) {
-            _image = {
-              w: img.width,
-              h: img.height,
-              _src: $(img).attr('src'),
-              src: encodeURI($(img).attr('src')),
-              path: img.src
-            };
-            if (_image.w * _image.h >= 153000) {
-              return addImageXLarge(_image);
-            }
-            if (_image.w * _image.h >= 76800) {
-              return addImageLarge(_image);
-            }
-            if (_image.w * _image.h > 12000) {
-              return addImageMedium(_image);
-            }
-            return addImageSmall(_image);
-          }
-        };
-        return img.src = $(e).attr('src');
-      });
+      return getImages();
     });
   };
 
