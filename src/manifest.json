@@ -29,9 +29,16 @@
 			"js": [
 				"bower/jquery/dist/jquery.min.js",
 				"bower/underscore/underscore-min.js",
-				"js/content.js"
+				"js/inject.js"
 			]
 		}
+	],
+	"web_accessible_resources": [
+		"css/gia.ui.css",
+		"css/iframe.css",
+		"img/selected.png",
+		"img/selected.svg",
+		"img/loading.gif"
 	],
 	"permissions": [
 		"activeTab",

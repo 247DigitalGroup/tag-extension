@@ -1,0 +1,109 @@
+#loading
+	width 80px
+	height 80px
+	background-image url(../img/loading.gif)
+	background-repeat no-repeat
+	background-position center
+	position fixed
+	top 50%
+	left 50%
+	margin-left -40px
+	margin-top -40px
+	z-index 1000
+	background-color black
+	border-radius 4px
+	opacity .8
+
+#error
+	background-color #f31a40
+	padding 10px 10px 20px 10px
+	text-align center
+	> h1.code
+		color white
+		margin 0
+		font-size 60px
+		line-height 60px
+	> p.description
+		color white
+		margin 0
+		
+.buttons
+	z-index 100000
+	position fixed
+	top 0
+	right 0
+	left 0
+	background-color rgba(#fff, .95)
+	border-bottom 1px solid #ddd
+	box-shadow 0 1px 10px 0 rgba(#000, .15)
+	padding 10px
+	text-align center
+	
+#login-form
+	background-color #eee
+	padding 10px
+	text-align center
+	p.status
+		color #39c
+		font-size 11px
+		margin 2px 0
+	input
+		margin-bottom 5px
+	button
+		margin-top 5px
+
+html, body
+	margin 0
+	padding 0
+	background-color white
+
+h5
+	font-weight bold
+	background-color #e5e5e5
+	border-top 1px solid #fff
+	border-bottom 1px solid #ccc
+	padding 4px 10px
+	margin 0
+	font-size 12px
+
+div.selector
+	margin-top 38px
+
+ul.images
+	> li
+		> div.image
+			height 200px
+			background-repeat no-repeat
+			background-size cover
+			position relative
+			> p.meta
+				font-size 11px
+				color white
+				background-color black
+				position absolute
+				top 0
+				right 0
+				margin 0
+				padding 3px 6px
+				z-index 2
+			&.selected
+				&:after
+					content ''
+					display block
+					position absolute
+					top 0
+					right 0
+					bottom 0
+					left 0
+					background-color rgba(#fff, .75)
+					background-image url(../img/selected.png)
+					background-repeat no-repeat
+					background-size 20px 20px
+					background-position right 10px bottom 10px
+	
+	&#large div.image
+		height 133px
+	&#medium div.image
+		height 133px
+	&#small div.image
+		height 100px

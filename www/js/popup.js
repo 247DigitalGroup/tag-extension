@@ -1,13 +1,11 @@
 (function() {
-  var api, calcSizes, createImagesList, getImages, imageClick, imageHover, imageOpen, openUrl, showError, tag, tagging;
+  var api, openUrl, tag;
 
   api = {
     root: 'http://192.168.1.17:8080',
     tag: '/articles/image_tagging',
     login: '/login'
   };
-
-  tagging = false;
 
   openUrl = function(data) {
     var message;
@@ -18,8 +16,6 @@
         url: data.url
       };
       chrome.runtime.sendMessage(message);
-      $('div#images ul.images').html('');
-      $('input#reveal').prop('checked', false);
       return null;
     }
   };
@@ -29,174 +25,58 @@
       data = null;
     }
     console.log('submit', data);
-    if (data === null) {
-      $.ajax({
-        url: api.root + api.tag,
-        method: 'post',
-        dataType: 'json',
-        data: data,
-        success: function(res, status, xhr) {
-          typeof res !== 'undefined' && typeof res.data !== 'undefined' && openUrl(res.data);
-          return null;
-        },
-        error: function(xhr, status, e) {
-          var em;
-          em = {
-            action: 'error',
-            code: '0',
-            description: ''
-          };
-          switch (xhr.status) {
-            case 0:
-              showError(404, 'Could not connect to the Tree of Souls!');
-              break;
-            case 401:
-              showError(401, 'You are not one of us!');
-          }
-          return null;
-        }
-      });
-    } else {
-      chrome.runtime.sendMessage({
-        action: 'tab.info'
-      }, function(current) {
-        if (typeof current._id !== 'undefined' && typeof current.url !== 'undefined') {
-          data._id = current._id;
-          data.url = current.url;
-        }
-        $.ajax({
-          url: api.root + api.tag,
-          method: 'post',
-          dataType: 'json',
-          data: data,
-          success: function(res, status, xhr) {
-            typeof res !== 'undefined' && typeof res.data !== 'undefined' && openUrl(res.data);
-            return null;
-          },
-          error: function(xhr, status, e) {
-            var em;
-            em = {
-              action: 'error',
-              code: '0',
-              description: ''
-            };
-            switch (xhr.status) {
-              case 0:
-                showError(404, 'Could not connect to the Tree of Souls!');
-                break;
-              case 401:
-                showError(401, 'You are not one of us!');
-            }
-            return null;
-          }
-        });
+    return $.ajax({
+      url: api.root + api.tag,
+      method: 'post',
+      dataType: 'json',
+      data: data,
+      success: function(res, status, xhr) {
+        typeof res !== 'undefined' && typeof res.data !== 'undefined' && openUrl(res.data);
         return null;
-      });
-    }
-    return null;
-  };
-
-  imageHover = function(e) {
-    var src;
-    src = $(e.currentTarget).attr('data-src');
-    chrome.tabs.query({
-      active: true,
-      currentWindow: true
-    }, function(tabs) {
-      return chrome.tabs.sendMessage(tabs[0].id, {
-        action: 'show',
-        src: src
-      });
-    });
-    return e.preventDefault();
-  };
-
-  imageClick = function(e) {
-    $(e.target).toggleClass('selected');
-    return e.preventDefault();
-  };
-
-  imageOpen = function(e) {
-    var path;
-    path = $(e.currentTarget).attr('data-path');
-    return window.open(path);
-  };
-
-  createImagesList = function(images) {
-    var group, image, j, len, listHTML, results, type;
-    $('div#images > ul.images').html('');
-    results = [];
-    for (type in images) {
-      group = images[type];
-      listHTML = '';
-      for (j = 0, len = group.length; j < len; j++) {
-        image = group[j];
-        listHTML += "<li data-src=\"" + image.src + "\" data-path=\"" + image.path + "\"><div class=\"image\" style=\"background-image: url(" + image.path + ")\"></div></li>";
+      },
+      error: function(xhr, status, e) {
+        var em;
+        em = {
+          action: 'error',
+          code: '0',
+          description: ''
+        };
+        switch (xhr.status) {
+          case 0:
+            showError(404, 'Could not connect to the Tree of Souls!');
+            break;
+          case 401:
+            showError(401, 'You are not one of us!');
+        }
+        return null;
       }
-      $("div#images > ul#" + type).html(listHTML);
-      results.push(calcSizes());
-    }
-    return results;
-  };
-
-  getImages = function() {
-    return chrome.tabs.query({
-      active: true,
-      currentWindow: true
-    }, function(tabs) {
-      var currentTabId;
-      currentTabId = tabs[0].id;
-      return chrome.tabs.sendMessage(currentTabId, {
-        action: 'images'
-      }, function(images) {
-        return createImagesList(images);
-      });
-    });
-  };
-
-  calcSizes = function() {
-    return $('ul.images > li[data-path]').each(function(i, e) {
-      var src;
-      src = $(e).attr('data-path');
-      return $('<img/>').attr('src', src).load(function() {
-        var h, w;
-        w = this.width;
-        h = this.height;
-        return $(e).find('> div.image').append("<p class=\"meta\">" + w + "x" + h + "</p>");
-      });
     });
   };
 
   $(document).ready(function() {
-    getImages();
-    $('ul.images').delegate('> li', 'click', imageHover).delegate('> li', 'contextmenu', imageClick).delegate('> li', 'dblclick', imageOpen);
     $('#tag').click(function() {
+      return tag();
+    });
+    $('#skip').click(function() {
       return chrome.tabs.query({
         active: true,
         currentWindow: true
       }, function(tabs) {
-        return chrome.tabs.sendMessage(tabs[0].id, {
-          action: 'html'
-        }, function(html) {
-          var data, e, i, j, len, src, urls;
-          urls = [];
-          e = $('div#images li[data-src] div.image.selected');
-          for (j = 0, len = e.length; j < len; j++) {
-            i = e[j];
-            src = $(i).parent().attr('data-path');
-            urls.push(src);
+        var tabId;
+        tabId = tabs[0].id;
+        return chrome.runtime.sendMessage({
+          action: 'tab.info'
+        }, function(info) {
+          var data;
+          if (typeof info._id !== 'undefined' && typeof info.url !== 'undefined') {
+            data = {
+              _id: info._id,
+              url: info.url,
+              skip: true
+            };
+            return tag(data);
           }
-          data = {
-            html: html,
-            image_urls: urls
-          };
-          return tag(data);
         });
-      });
-    });
-    $('#skip').click(function() {
-      return tag({
-        skip: true
       });
     });
     $('#reveal').change(function() {
@@ -257,10 +137,6 @@
       });
     });
   });
-
-  showError = function(code, description) {
-    return $('#error').find('> h1.code').text(code).end().find('> p.description').text(description).end().removeClass('hide');
-  };
 
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log(request, sender);

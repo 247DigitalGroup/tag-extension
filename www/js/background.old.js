@@ -4,11 +4,10 @@
   _tabs = {};
 
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    var message, tabId;
+    var message;
     console.log('get', request);
     if (request.action) {
       if (sender.tab) {
-        tabId = sender.tab.id;
         switch (request.action) {
           case 'tab.info':
             if (typeof _tabs[sender.tab.id] !== 'undefined') {
@@ -17,20 +16,6 @@
             } else {
               console.log('post', {});
               sendResponse({});
-            }
-            break;
-          case 'tag':
-            if (typeof request.data !== 'undefined') {
-              _tabs[tabId] = {
-                _id: request.data._id,
-                url: request.data.url
-              };
-              chrome.tabs.executeScript(tabId, {
-                code: 'window.onbeforeunload = null;'
-              });
-              chrome.tabs.update(tabId, {
-                url: request.data.url
-              });
             }
         }
       } else {
@@ -46,6 +31,7 @@
                 active: true,
                 currentWindow: true
               }, function(tabs) {
+                var tabId;
                 tabId = tabs[0].id;
                 _tabs[tabId] = {
                   _id: request._id,
@@ -65,6 +51,7 @@
               active: true,
               currentWindow: true
             }, function(tabs) {
+              var tabId;
               tabId = tabs[0].id;
               if (typeof _tabs[tabId] !== 'undefined') {
                 console.log('post', _tabs[tabId]);

@@ -14,15 +14,37 @@ html
 
 	body
 
+
 		.buttons
 			button#tag Tag
 			button#skip Skip
+			input(type="checkbox")#reveal
+
+
+		#images
+			#error.hide
+				h1.code 0
+				p.description Description
+			.progress.hide
+				.progress-bar
+			h5 xlarge
+			ul#xlarge.images.bg.sm-2.sp-0
+			h5 large
+			ul#large.images.bg.sm-3.sp-0
+			h5 medium
+			ul#medium.images.bg.sm-3.sp-0
+			h5 small
+			ul#small.images.bg.sm-4.sp-0
+
+				
 
 		form#login-form
 			input#email(type="text", value="gia@coa.vn", placeholder="your@email.com")
 			input#password(type="password", value="gia.ninja", placeholder="password")
 			p.status.hide
 			button#login Submit
+
+
 
 		script(type="text/javascript", src="/bower/jquery/dist/jquery.min.js")
 		script(type="text/javascript", src="/bower/underscore/underscore-min.js")

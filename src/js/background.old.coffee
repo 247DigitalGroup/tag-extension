@@ -7,7 +7,6 @@ chrome
     console.log 'get', request
     if request.action
       if sender.tab
-        tabId = sender.tab.id
         switch request.action
           when 'tab.info'
             if typeof _tabs[sender.tab.id] isnt 'undefined'
@@ -16,13 +15,6 @@ chrome
             else
               console.log 'post', {}
               sendResponse {}
-          when 'tag'
-            if typeof request.data isnt 'undefined'
-              _tabs[tabId] =
-                _id: request.data._id
-                url: request.data.url
-              chrome.tabs.executeScript tabId, code: 'window.onbeforeunload = null;'
-              chrome.tabs.update tabId, url: request.data.url
       else
         switch request.action
           when 'open'

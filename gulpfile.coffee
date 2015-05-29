@@ -48,7 +48,7 @@ configs =
 		bare: false
 
 	stylus:
-		compress: false
+		compress: true
 		use: nib()
 		import: 'nib'
 
